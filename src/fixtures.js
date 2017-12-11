@@ -436,6 +436,7 @@ export const mapData = {
     }]
   },
   layers: [{
+    cluster: true,
     name: 'Marker Layer',
     data: [{
       latitude: 47.45,
@@ -608,7 +609,6 @@ const maleData = Array.from({
 })
 
 export const scatterSeries = {
-  labels: [],
   datasets: [{
     label: 'Female',
     pointBackgroundColor: 'rgba(223, 83, 83, .5)',

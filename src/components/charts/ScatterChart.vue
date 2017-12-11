@@ -1,8 +1,8 @@
 <script>
 import Chart from './Chart'
-import {Pie, mixins} from 'vue-chartjs'
+import {Line, mixins} from 'vue-chartjs'
 
-export default Pie.extend({
+export default Line.extend({
   mixins: [Chart, mixins.reactiveProp, mixins.reactiveData],
   methods: {
     customData(data) {
@@ -16,7 +16,16 @@ export default Pie.extend({
     },
 
     customOptions(options) {
+      const {scales} = options
+      const {xAxes = {}} = options.scales
+
       options.showLines = options.showLines || false
+
+      scales.xAxes = {
+        ...xAxes,
+        type: 'linear',
+        position: 'bottom'
+      }
 
       return options
     }

@@ -25,8 +25,7 @@ export default {
   components: [ChartButtons],
   computed: {
     parsedData() {
-      return this.parseObjectsFromData({...this.data
-      }, this.options.scales)
+      return this.parseObjectsFromData({...this.data}, this.options.scales)
     }
   },
   data: function () {

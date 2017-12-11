@@ -1,33 +1,8 @@
 import changeCase from 'change-case'
+import Download from 'material-ui/svg-icons/file/file-download'
+import MenuItem from 'material-ui/MenuItem'
+import React from 'react'
 import uuid from 'node-uuid'
-
-export const parseDataOptions = (dataOptions) => {
-  const {
-    latField = 'Latitude',
-    longField = 'Longitude'
-  } = dataOptions
-  const {
-    label,
-    sourcePrefix,
-    destinationPrefix
-  } = dataOptions
-  const latTitle = changeCase.titleCase(latField)
-  const longTitle = changeCase.titleCase(longField)
-  const labelFields = Array.isArray(label)
-    ? label
-    : (label ? [label] : [])
-
-  return {
-    ...dataOptions,
-    destinationLat: `${destinationPrefix}${latTitle}`,
-    destinationLong: `${destinationPrefix}${longTitle}`,
-    labelFields,
-    latField,
-    longField,
-    sourceLat: `${sourcePrefix}${latTitle}`,
-    sourceLong: `${sourcePrefix}${longTitle}`
-  }
-}
 
 /* global document */
 
@@ -57,15 +32,12 @@ export const excludeEmptyFilters = (filters) => (
   })
 )
 
-export const excludeEmptyFiltersObject = (filters) => (
-  excludeEmptyFilters(filtersToArray(filters))
-)
-
-export const saveCanvasFromVisualization = (metadata) => {
+export const saveCanvasFromVisualization = (metadata, visualization) => {
+  const {_component: {_component}} = visualization
   const {name} = metadata
 
   saveCanvas(
-    this.getChartCanvas(),
+    _component.getChartCanvas(),
     changeCase.pascalCase(name) + '.png'
   )
 }
@@ -79,8 +51,44 @@ export const saveCanvas = (canvas, name) => {
   aLink.click()
 }
 
-export const exportTableToCSV = () => {
-  this.exportToCSV()
+export const exportTableToCSV = (metadata, visualization) => {
+  visualization._component._component.exportToCSV()
+}
+
+export const menuItemDefs = {
+  Chart: [{
+    key: 'saveChart',
+    leftIcon: <Download />,
+    primaryText: 'Export',
+    onTouchTap: saveCanvasFromVisualization
+  }],
+  Map: [],
+  Summary: [],
+  Table: [{
+    key: 'exportTable',
+    leftIcon: <Download />,
+    primaryText: 'Export',
+    onTouchTap: exportTableToCSV
+  }]
+}
+
+export const generateMenuItems = (type, params) => {
+  return (menuItemDefs[type] || [])
+    .map(({key, leftIcon, primaryText, onTouchTap}, i) => {
+      const onTouchTapWrapper = () => {
+        onTouchTap(...params)
+      }
+
+      return (
+        <MenuItem
+          key={key}
+          leftIcon={leftIcon}
+          primaryText={primaryText}
+          style={{cursor: 'default'}}
+          onTouchTap={onTouchTapWrapper}
+        />
+      )
+    })
 }
 
 export const defaultFetchOptions = {
@@ -120,6 +128,17 @@ export const getValueByPath = (object, path) => {
   })
 
   return currentValue
+}
+
+export const createFilter = (filter = {}) => {
+  const initialValue = {
+    field: '',
+    operator: '=',
+    required: false,
+    value: ''
+  }
+
+  return Object.assign({}, initialValue, filter)
 }
 
 export const validateFilters = (filters = {}) => {
